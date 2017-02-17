@@ -21,8 +21,8 @@ namespace lb8
             bool go_on = true;
             string gorod = "38836";
             string site = "http://informer.gismeteo.by/rss/";
-            try
-            {
+            //try
+            //{
                 while (go_on)
                 {                
                 Console.Clear();
@@ -67,12 +67,12 @@ namespace lb8
                 }
                 }
             }
-        catch(Exception)
-            {
-                Console.WriteLine("Неверный ввод Завершение программы");
-                Environment.Exit(0);
-            }
-        }
+        //catch(Exception)
+        //    {
+        //        Console.WriteLine("Неверный ввод Завершение программы");
+        //        Environment.Exit(0);
+        //    }
+        //}
 
         private static void selectMaxTemp(string gorod, string site)
         {
@@ -117,6 +117,7 @@ namespace lb8
                             //string pattern = @"\b(\d+?)\b";                            
                             Regex regex = new Regex(pattern);
                             Match match = regex.Match(newDew[i].Trim());
+                            int k = Convert.ToInt32(match.Value) ;
                             while (match.Success)
                             {
                                 if (tempNumber == null)
@@ -124,15 +125,17 @@ namespace lb8
                                     tempNumber = it.Current.Value;
                                     tempName = name;
                                     tempTemper = match.Groups[1].Value;
+                                    continue;
+                                    
                                 }
-                                if (Convert.ToUInt32( tempTemper)< Convert.ToUInt32(match.Groups[1].Value))
+                                if (Convert.ToUInt32(tempTemper)< k)
                                 {
                                     tempNumber = it.Current.Value;
                                     tempName = name;
                                     tempTemper = match.Groups[1].Value;
                                 }
                                 //Console.WriteLine(match.Groups[1].Value);
-                                //match = match.NextMatch();
+                                match = match.NextMatch();
                             }
 
                             //arr = newDew[i].ToCharArray();
@@ -153,7 +156,7 @@ namespace lb8
                     break;
                 }
             }
-            Console.WriteLine("Самая теплая погода в {0} -- {1}", tempName, tempTemper);
+            Console.WriteLine("Самая теплая погода в {0} максимальная температура {1} С", tempName, tempTemper);
         }
 
         private static void defaultCity()
@@ -285,7 +288,7 @@ namespace lb8
                 {
                     if (newDew[i].Contains("температура"))
                     {
-                        Console.WriteLine(newDew[i]/*.Replace(" ", "")*/);
+                        Console.WriteLine(newDew[i].Trim()/*.Replace(" ", "")*/);
                     }
                 }
                 break;
