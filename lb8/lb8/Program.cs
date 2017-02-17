@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -30,8 +31,8 @@ namespace lb8
                 Console.WriteLine("1 - Создать XML документ исходных городов по заданию");
                 Console.WriteLine("2 - Добавить город в XML документ");
                 Console.WriteLine("3 - Отобразить города из XML документа");
-                //Console.WriteLine("4 - Найти самую теплую погоду в представленных городах");
-                Console.WriteLine("5 - Выбрать город и просматреть погоду на текущую дату");                
+                Console.WriteLine("4 - Найти самую теплую погоду в представленных городах");
+                Console.WriteLine("5 - Выбрать город и просмотреть погоду на текущую дату");                
                 Console.WriteLine("0 - Выход из программы");
                 Console.WriteLine("**************************************************************");
 
@@ -48,7 +49,8 @@ namespace lb8
                             endCase();
                         break;
                     case '4':
-                            selectMaxTemp();
+                            selectMaxTemp(gorod, site);
+                            endCase();
                         break;
                     case '5':
                             readDoc();
@@ -72,9 +74,86 @@ namespace lb8
             }
         }
 
-        private static void selectMaxTemp()
+        private static void selectMaxTemp(string gorod, string site)
         {
-            throw new NotImplementedException();
+            string tempName = null;
+            string tempNumber=null;
+            string tempTemper = null;
+            char[] arr;
+            XPathDocument doc2 = new XPathDocument($"city.xml");
+            XPathNavigator nav2 = doc2.CreateNavigator();
+            XPathNodeIterator iterator2 = nav2.Select("/CITY/city");
+            while (iterator2.MoveNext())
+            {
+                XPathNodeIterator it2 = iterator2.Current.Select("name");
+                it2.MoveNext();
+                string name2 = it2.Current.Value;
+                it2 = iterator2.Current.Select("number");
+                it2.MoveNext();
+                string number2 = it2.Current.Value;
+                Console.WriteLine("Город {0} ", name2);
+                gorod = number2;
+
+                XPathDocument doc = new XPathDocument($"{site}{gorod}.xml");
+                XPathNavigator nav = doc.CreateNavigator();
+                XPathNodeIterator iterator = nav.Select("/rss/channel/item");
+                while (iterator.MoveNext())
+                {
+                    XPathNodeIterator it = iterator.Current.Select("title");
+                    it.MoveNext();
+                    string name = it.Current.Value;
+                    it = iterator.Current.Select("description");
+                    it.MoveNext();
+                    string number = it.Current.Value;
+                    //Console.WriteLine("Вы выбрали = Код - {1}  Город - {0}", name, number);
+                    string[] newDew = number.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                    for (int i = 0; i < newDew.Length; i++)
+                    {
+                        if (newDew[i].Contains("температура"))
+                        {
+                            Console.WriteLine(newDew[i].Trim()/*.Replace(" ", "")*/);
+                            string pattern = @"([-]\d+?|\d+?)\s";
+                            //string pattern = @"\b(\d+?)\b";                            
+                            Regex regex = new Regex(pattern);
+                            Match match = regex.Match(newDew[i].Trim());
+                            while (match.Success)
+                            {
+                                if (tempNumber == null)
+                                {
+                                    tempNumber = it.Current.Value;
+                                    tempName = name;
+                                    tempTemper = match.Groups[1].Value;
+                                }
+                                if (Convert.ToUInt32( tempTemper)< Convert.ToUInt32(match.Groups[1].Value))
+                                {
+                                    tempNumber = it.Current.Value;
+                                    tempName = name;
+                                    tempTemper = match.Groups[1].Value;
+                                }
+                                //Console.WriteLine(match.Groups[1].Value);
+                                //match = match.NextMatch();
+                            }
+
+                            //arr = newDew[i].ToCharArray();
+                            //for (int j = 0; j < arr.Length; j++)
+                            //{
+                            //    if (Char.IsDigit(arr[j]))
+                            //    {
+                            //        if (tempNumber == null)
+                            //        {
+                            //            tempNumber = Convert.ToString(arr[j]);
+                            //            tempName = name;
+                            //            tempTemper = newDew[i]/*.Replace(" ", "")*/;
+                            //        }
+                            //    }
+                            //}
+                        }
+                    }
+                    break;
+                }
+            }
+            Console.WriteLine("Самая теплая погода в {0} -- {1}", tempName, tempTemper);
         }
 
         private static void defaultCity()
@@ -199,14 +278,14 @@ namespace lb8
                 it = iterator.Current.Select("description");
                 it.MoveNext();
                 string number = it.Current.Value;
-                Console.WriteLine("Вы выбрали = Код - {1}  Город - {0}", name, number);
+                Console.WriteLine("Город {0} ", name);
                 string[] newDew = number.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 for (int i = 0; i < newDew.Length; i++)
                 {
                     if (newDew[i].Contains("температура"))
                     {
-                        Console.WriteLine(newDew[i].Replace(" ", ""));
+                        Console.WriteLine(newDew[i]/*.Replace(" ", "")*/);
                     }
                 }
                 break;
