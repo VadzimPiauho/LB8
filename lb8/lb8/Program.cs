@@ -21,8 +21,8 @@ namespace lb8
             bool go_on = true;
             string gorod = "38836";
             string site = "http://informer.gismeteo.by/rss/";
-            //try
-            //{
+            try
+            {
                 while (go_on)
                 {                
                 Console.Clear();
@@ -66,15 +66,15 @@ namespace lb8
                         break;
                 }
                 }
+        }
+        catch(Exception)
+            {
+                Console.WriteLine("Неверный ввод Завершение программы");
+                Environment.Exit(0);
             }
-        //catch(Exception)
-        //    {
-        //        Console.WriteLine("Неверный ввод Завершение программы");
-        //        Environment.Exit(0);
-        //    }
-        //}
+}
 
-        private static void selectMaxTemp(string gorod, string site)
+private static void selectMaxTemp(string gorod, string site)
         {
             string tempName = null;
             string tempNumber=null;
