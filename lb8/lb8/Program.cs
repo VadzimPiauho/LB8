@@ -73,7 +73,6 @@ namespace lb8
                 Environment.Exit(0);
             }
 }
-
 private static void selectMaxTemp(string gorod, string site)
         {
             string tempName = null;
@@ -118,6 +117,7 @@ private static void selectMaxTemp(string gorod, string site)
                             Regex regex = new Regex(pattern);
                             Match match = regex.Match(newDew[i].Trim());
                             int k = Convert.ToInt32(match.Value) ;
+                            int z = Convert.ToInt32(tempTemper);
                             while (match.Success)
                             {
                                 if (tempNumber == null)
@@ -125,10 +125,11 @@ private static void selectMaxTemp(string gorod, string site)
                                     tempNumber = it.Current.Value;
                                     tempName = name;
                                     tempTemper = match.Groups[1].Value;
+                                    z = Convert.ToInt32(tempTemper);
                                     continue;
                                     
                                 }
-                                if (Convert.ToUInt32(tempTemper)< k)
+                                if (z < k)
                                 {
                                     tempNumber = it.Current.Value;
                                     tempName = name;
